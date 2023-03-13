@@ -15,13 +15,24 @@
  * 
  */
 
+/*
+ * http://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part1.html#__RefHeading__1419828_253892949
+*
+*/
+
+using System.ComponentModel;
 using System.Xml;
 
 namespace AODL.Document.Styles.Properties {
+
+
+
 	/// <summary>
 	/// Represent access to the possible attributes of of an paragraph-propertie element.
 	/// </summary>
-	public class ParagraphProperties : IProperty {
+	public partial class ParagraphProperties : IProperty {
+
+		
 		/// <summary>
 		/// The ParagraphStyle object to this object belongs.
 		/// </summary>
@@ -34,225 +45,44 @@ namespace AODL.Document.Styles.Properties {
 			}
 		}
 
+		///
+		/// Einfache Property werden durch "ParagraphPropertyTemplates.tt" erzeugt!
+		///
+
+
 		/// <summary>
-		/// diub - Dipl.-Ing. Uwe Barth 2021-04-14
-		/// added this Property!
 		/// </summary>
-		public string MarginTop {
+		/// <value></value>
+		//public string Border {
+		//	get {
+		//		XmlNode xn = this._node.SelectSingleNode ("@fo:border", this.Style.Document.NamespaceManager);
+		//		if (xn != null)
+		//			return xn.InnerText;
+		//		return null;
+		//	}
+		//	set {
+		//		XmlNode xn = this._node.SelectSingleNode ("@fo:border", this.Style.Document.NamespaceManager);
+		//		if (xn == null)
+		//			this.CreateAttribute ("border", value, "fo");
+		//		this._node.SelectSingleNode ("@fo:border", this.Style.Document.NamespaceManager).InnerText = value;
+		//	}
+		//}
+
+		public string PageNumber {
 			get {
-				XmlNode xn = this._node.SelectSingleNode("@fo:margin-top", this.Style.Document.NamespaceManager) ;
+				XmlNode xn = this._node.SelectSingleNode ("@style:page-number", this.Style.Document.NamespaceManager);
 				if (xn != null)
 					return xn.InnerText;
 				return null;
 			}
 			set {
-				XmlNode xn = this._node.SelectSingleNode("@fo:margin-top", this.Style.Document.NamespaceManager);
+				XmlNode xn = this._node.SelectSingleNode ("@style:page-number", this.Style.Document.NamespaceManager);
 				if (xn == null)
-					this.CreateAttribute ("margin-top", value, "fo");
-				this._node.SelectSingleNode ("@fo:margin-top", this.Style.Document.NamespaceManager).InnerText = value;
+					this.CreateAttribute ("page-number", value, "style");
+				this._node.SelectSingleNode ("@style:page-number", this.Style.Document.NamespaceManager).InnerText = value;
 			}
 		}
 
-		/// <summary>
-		/// diub - Dipl.-Ing. Uwe Barth 2021-04-14
-		/// added this Property!
-		/// </summary>
-		public string MarginRight {
-			get {
-				XmlNode xn = this._node.SelectSingleNode("@fo:margin-right", this.Style.Document.NamespaceManager) ;
-				if (xn != null)
-					return xn.InnerText;
-				return null;
-			}
-			set {
-				XmlNode xn = this._node.SelectSingleNode("@fo:margin-right", this.Style.Document.NamespaceManager);
-				if (xn == null)
-					this.CreateAttribute ("margin-right", value, "fo");
-				this._node.SelectSingleNode ("@fo:margin-right", this.Style.Document.NamespaceManager).InnerText = value;
-			}
-		}
-
-		/// <summary>
-		/// diub - Dipl.-Ing. Uwe Barth 2021-04-14
-		/// added this Property!
-		/// </summary>
-		public string MarginBottom {
-			get {
-				XmlNode xn = this._node.SelectSingleNode("@fo:margin-bottom", this.Style.Document.NamespaceManager) ;
-				if (xn != null)
-					return xn.InnerText;
-				return null;
-			}
-			set {
-				XmlNode xn = this._node.SelectSingleNode("@fo:margin-bottom", this.Style.Document.NamespaceManager);
-				if (xn == null)
-					this.CreateAttribute ("margin-bottom", value, "fo");
-				this._node.SelectSingleNode ("@fo:margin-bottom", this.Style.Document.NamespaceManager).InnerText = value;
-			}
-		}
-
-		/// <summary>
-		/// Margin left. in cm an object .MarginLeft = "1cm";
-		/// </summary>
-		public string MarginLeft {
-			get {
-				XmlNode xn = this._node.SelectSingleNode("@fo:margin-left",
-					  this.Style.Document.NamespaceManager) ;
-				if (xn != null)
-					return xn.InnerText;
-				return null;
-			}
-			set {
-				XmlNode xn = this._node.SelectSingleNode("@fo:margin-left",
-					  this.Style.Document.NamespaceManager);
-				if (xn == null)
-					this.CreateAttribute ("margin-left", value, "fo");
-				this._node.SelectSingleNode ("@fo:margin-left",
-					  this.Style.Document.NamespaceManager).InnerText = value;
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the break before.
-		/// e.g. set this to "page" if this paragraph
-		/// should be start on the next page.
-		/// </summary>
-		/// <value>The break before.</value>
-		public string BreakBefore {
-			get {
-				XmlNode xn = this._node.SelectSingleNode("@fo:break-before",
-					this.Style.Document.NamespaceManager) ;
-				if (xn != null)
-					return xn.InnerText;
-				return null;
-			}
-			set {
-				XmlNode xn = this._node.SelectSingleNode("@fo:break-before",
-					this.Style.Document.NamespaceManager);
-				if (xn == null)
-					this.CreateAttribute ("break-before", value, "fo");
-				this._node.SelectSingleNode ("@fo:break-before",
-					this.Style.Document.NamespaceManager).InnerText = value;
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the break after.
-		/// e.g. set this to "page" if after this paragraph
-		/// should be added a new page.
-		/// </summary>
-		/// <value>The break before.</value>
-		public string BreakAfter {
-			get {
-				XmlNode xn = this._node.SelectSingleNode("@fo:break-after",
-					this.Style.Document.NamespaceManager) ;
-				if (xn != null)
-					return xn.InnerText;
-				return null;
-			}
-			set {
-				XmlNode xn = this._node.SelectSingleNode("@fo:break-after",
-					this.Style.Document.NamespaceManager);
-				if (xn == null)
-					this.CreateAttribute ("break-after", value, "fo");
-				this._node.SelectSingleNode ("@fo:break-after",
-					this.Style.Document.NamespaceManager).InnerText = value;
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the border.
-		/// This could be e.g. 0.002cm solid #000000 (width, linestyle, color)
-		/// or none
-		/// </summary>
-		/// <value>The border.</value>
-		public string Border {
-			get {
-				XmlNode xn = this._node.SelectSingleNode("@fo:border",
-					this.Style.Document.NamespaceManager);
-				if (xn != null)
-					return xn.InnerText;
-				return null;
-			}
-			set {
-				XmlNode xn = this._node.SelectSingleNode("@fo:border",
-					this.Style.Document.NamespaceManager);
-				if (xn == null)
-					this.CreateAttribute ("border", value, "fo");
-				this._node.SelectSingleNode ("@fo:border",
-					this.Style.Document.NamespaceManager).InnerText = value;
-			}
-		}
-
-		/// <summary>
-		/// Set the background color
-		/// Use Colors.GetColor(Color color) to set 
-		/// on of the available .net colors
-		/// </summary>
-		public string BackgroundColor {
-			get {
-				XmlNode xn = this._node.SelectSingleNode("@fo:background-color",
-					this.Style.Document.NamespaceManager);
-				if (xn != null)
-					return xn.InnerText;
-				return null;
-			}
-			set {
-				XmlNode xn = this._node.SelectSingleNode("@fo:background-color",
-					this.Style.Document.NamespaceManager);
-				if (xn == null)
-					this.CreateAttribute ("background-color", value, "fo");
-				this._node.SelectSingleNode ("@fo:background-color",
-					this.Style.Document.NamespaceManager).InnerText = value;
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the padding. 
-		/// Default 0.049cm 
-		/// Use this in combination with the Border property
-		/// </summary>
-		/// <value>The padding.</value>
-		public string Padding {
-			get {
-				XmlNode xn = this._node.SelectSingleNode("@fo:padding",
-					this.Style.Document.NamespaceManager);
-				if (xn != null)
-					return xn.InnerText;
-				return null;
-			}
-			set {
-				XmlNode xn = this._node.SelectSingleNode("@fo:padding",
-					this.Style.Document.NamespaceManager);
-				if (xn == null)
-					this.CreateAttribute ("padding", value, "fo");
-				this._node.SelectSingleNode ("@fo:padding",
-					this.Style.Document.NamespaceManager).InnerText = value;
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the line height in %.
-		/// 200% means double space
-		/// </summary>
-		/// <value>The line height.</value>
-		public string LineSpacing {
-			get {
-				XmlNode xn = this._node.SelectSingleNode("@fo:line-height",
-					this.Style.Document.NamespaceManager);
-				if (xn != null)
-					return xn.InnerText;
-				return null;
-			}
-			set {
-				XmlNode xn = this._node.SelectSingleNode("@fo:line-height",
-					this.Style.Document.NamespaceManager);
-				if (xn == null)
-					this.CreateAttribute ("line-height", value, "fo");
-				this._node.SelectSingleNode ("@fo:line-height",
-					this.Style.Document.NamespaceManager).InnerText = value;
-			}
-		}
 
 		private TabStopStyleCollection _tabstopstylecollection;
 		/// <summary>
@@ -277,24 +107,6 @@ namespace AODL.Document.Styles.Properties {
 				this._tabstopstylecollection = value;
 				if (this.Node.SelectSingleNode ("style:tab-stops", this.Style.Document.NamespaceManager) == null)
 					this.Node.AppendChild (this._tabstopstylecollection.Node);
-			}
-		}
-
-		/// <summary>
-		/// Set paragraph alignment - object.Alignment = TextAlignments.right.ToString()
-		/// </summary>
-		public string Alignment {
-			get {
-				XmlNode xn = this._node.SelectSingleNode("@fo:text-align", this.Style.Document.NamespaceManager);
-				if (xn != null)
-					return xn.InnerText;
-				return null;
-			}
-			set {
-				XmlNode xn = this._node.SelectSingleNode("@fo:text-align", this.Style.Document.NamespaceManager);
-				if (xn == null)
-					this.CreateAttribute ("text-align", value, "fo");
-				this._node.SelectSingleNode ("@fo:text-align", this.Style.Document.NamespaceManager).InnerText = value;
 			}
 		}
 
@@ -324,7 +136,7 @@ namespace AODL.Document.Styles.Properties {
 		/// <param name="text">The attribute value.</param>
 		/// <param name="prefix">The namespace prefix.</param>
 		private void CreateAttribute (string name, string text, string prefix) {
-			XmlAttribute xa = this.Style.Document.CreateAttribute(name, prefix);
+			XmlAttribute xa = this.Style.Document.CreateAttribute (name, prefix);
 			xa.Value = text;
 			this.Node.Attributes.Append (xa);
 		}
@@ -372,27 +184,27 @@ namespace AODL.Document.Styles.Properties {
 		/// Get the css style fragement
 		/// </summary>
 		/// <returns>The css style attribute</returns>
-		public string GetHtmlStyle () {
-			string style        = "style=\"";
+		//public string GetHtmlStyle () {
+		//	string style = "style=\"";
 
-			if (this.Alignment != null)
-				style += "text-align: " + this.Alignment + "; ";
-			if (this.MarginLeft != null)
-				style += "text-indent: " + this.MarginLeft + "; ";
-			if (this.LineSpacing != null)
-				style += "line-height: " + this.LineSpacing + "; ";
-			if (this.Border != null && this.Padding == null)
-				style += "border-width:1px; border-style:solid; padding: 0.5cm; ";
-			if (this.Border != null && this.Padding != null)
-				style += "border-width:1px; border-style:solid; padding:" + this.Padding + "; ";
+		//	if (this.TextAlign != null)
+		//		style += "text-align: " + this.TextAlign + "; ";
+		//	if (this.MarginLeft != null)
+		//		style += "text-indent: " + this.MarginLeft + "; ";
+		//	if (this.LineHeight != null)
+		//		style += "line-height: " + this.LineHeight + "; ";
+		//	if (this.Border != null && this.Padding == null)
+		//		style += "border-width:1px; border-style:solid; padding: 0.5cm; ";
+		//	if (this.Border != null && this.Padding != null)
+		//		style += "border-width:1px; border-style:solid; padding:" + this.Padding + "; ";
 
-			if (!style.EndsWith ("; "))
-				style = "";
-			else
-				style += "\"";
+		//	if (!style.EndsWith ("; "))
+		//		style = "";
+		//	else
+		//		style += "\"";
 
-			return style;
-		}
+		//	return style;
+		//}
 
 		#endregion
 	}
@@ -400,20 +212,20 @@ namespace AODL.Document.Styles.Properties {
 	/// <summary>
 	/// Some helper constants for Paragraph properties
 	/// </summary>
-	public class ParagraphHelper {
-		/// <summary>
-		/// Line spacing 1.5 lines
-		/// </summary>
-		public static readonly string LineSpacing15 = "150%";
-		/// <summary>
-		/// Line spacing double
-		/// </summary>
-		public static readonly string LineDouble    = "200%";
-		/// <summary>
-		/// Line spacing three lines
-		/// </summary>
-		public static readonly string LineSpacing3  = "300%";
-	}
+	//public class ParagraphHelper {
+	//	/// <summary>
+	//	/// Line spacing 1.5 lines
+	//	/// </summary>
+	//	public static readonly string LineSpacing15 = "150%";
+	//	/// <summary>
+	//	/// Line spacing double
+	//	/// </summary>
+	//	public static readonly string LineDouble = "200%";
+	//	/// <summary>
+	//	/// Line spacing three lines
+	//	/// </summary>
+	//	public static readonly string LineSpacing3 = "300%";
+	//}
 }
 
 /*

@@ -24,6 +24,7 @@ using AODL.Document.Import;
 using AODL.Document.Import.OpenDocument;
 using AODL.Document.Import.OpenDocument.NodeProcessors;
 using AODL.Document.Styles;
+using diub.Log;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -57,7 +58,7 @@ namespace AODL.Document.TextDocuments {
 	/// </example>
 	public class TextDocument : IDisposable, IDocument {
 		//AODL.Document.TextDocuments.Content.IContentContainer,
-		private int _tableOfContentsCount   = 0;
+		private int _tableOfContentsCount = 0;
 		/// <summary>
 		/// Gets the tableof contents count.
 		/// </summary>
@@ -68,7 +69,7 @@ namespace AODL.Document.TextDocuments {
 			}
 		}
 
-		private int _tableCount             = 0;
+		private int _tableCount = 0;
 		/// <summary>
 		/// Gets the tableof contents count.
 		/// </summary>
@@ -301,12 +302,15 @@ namespace AODL.Document.TextDocuments {
 			this.CommonStyles = new IStyleCollection ();
 			this.FontList = new ArrayList ();
 			this._graphics = new ArrayList ();
+
+			// diub - Dipl.-Ing. Uwe Barth 2021-05-04
+			New ();
 		}
 
 		/// <summary>
 		/// Create a blank new document.
 		/// </summary>
-		public void New () {
+		private void New () {
 			this._xmldoc = new XmlDocument ();
 			this._xmldoc.LoadXml (TextDocumentHelper.GetBlankDocument ());
 			this.NamespaceManager = TextDocumentHelper.NameSpace (this._xmldoc.NameTable);
@@ -335,11 +339,11 @@ namespace AODL.Document.TextDocuments {
 		/// Reads the common styles.
 		/// </summary>
 		private void ReadCommonStyles () {
-			OpenDocumentImporter odImporter = new OpenDocumentImporter();
+			OpenDocumentImporter odImporter = new OpenDocumentImporter ();
 			odImporter._document = this;
 			odImporter.ImportCommonStyles ();
 
-			LocalStyleProcessor lsp = new LocalStyleProcessor(this, true);
+			LocalStyleProcessor lsp = new LocalStyleProcessor (this, true);
 			lsp.ReadStyles ();
 		}
 
@@ -355,8 +359,8 @@ namespace AODL.Document.TextDocuments {
 
 				this.NamespaceManager = TextDocumentHelper.NameSpace (this._xmldoc.NameTable);
 
-				ImportHandler importHandler = new ImportHandler();
-				IImporter importer      = importHandler.GetFirstImporter(DocumentTypes.TextDocument, file);
+				ImportHandler importHandler = new ImportHandler ();
+				IImporter importer = importHandler.GetFirstImporter (DocumentTypes.TextDocument, file);
 				if (importer != null) {
 					if (importer.NeedNewOpenDocument)
 						this.New ();
@@ -369,7 +373,7 @@ namespace AODL.Document.TextDocuments {
 									if (((AODLWarning) ob).Message != null)
 										Console.WriteLine ("Err: {0}", ((AODLWarning) ob).Message);
 									if (((AODLWarning) ob).Node != null) {
-										XmlTextWriter writer = new XmlTextWriter(Console.Out);
+										XmlTextWriter writer = new XmlTextWriter (Console.Out);
 										writer.Formatting = Formatting.Indented;
 										((AODLWarning) ob).Node.WriteContentTo (writer);
 									}
@@ -390,7 +394,7 @@ namespace AODL.Document.TextDocuments {
 		public XmlNode CreateNode (string name, string prefix) {
 			if (this.XmlDoc == null)
 				throw new NullReferenceException ("There is no XmlDocument loaded. Couldn't create Node " + name + " with Prefix " + prefix + ". " + this.GetType ().ToString ());
-			string nuri = this.GetNamespaceUri(prefix);
+			string nuri = this.GetNamespaceUri (prefix);
 			return this.XmlDoc.CreateElement (prefix, name, nuri);
 		}
 
@@ -403,7 +407,7 @@ namespace AODL.Document.TextDocuments {
 		public XmlAttribute CreateAttribute (string name, string prefix) {
 			if (this.XmlDoc == null)
 				throw new NullReferenceException ("There is no XmlDocument loaded. Couldn't create Attribue " + name + " with Prefix " + prefix + ". " + this.GetType ().ToString ());
-			string nuri = this.GetNamespaceUri(prefix);
+			string nuri = this.GetNamespaceUri (prefix);
 			return this.XmlDoc.CreateAttribute (prefix, name, nuri);
 		}
 
@@ -411,18 +415,24 @@ namespace AODL.Document.TextDocuments {
 		/// Save the TextDocument as OpenDocument textdocument.
 		/// </summary>
 		/// <param name="filename">The filename. With or without full path. Without will save the file to application path!</param>
-		public void SaveTo (string filename) {
+		public bool SaveTo (string filename) {
 			try {
 				//Build document first
+				//Logger.Write (MsgLogLevel.System, nameof (AODL), nameof (SaveTo) + ": FontList");
 				foreach (string font in this.FontList)
 					this.AddFont (font);
+
+				//Logger.Write (MsgLogLevel.System, nameof (AODL), nameof (SaveTo) + ": ContentBody");
 				this.CreateContentBody ();
 
 				//diub - Dipl.-Ing. Uwe Barth 2021-04-20
+				//Logger.Write (MsgLogLevel.System, nameof (AODL), nameof (SaveTo) + ": Exporter");
 				IExporter iExporter = new OpenDocumentTextExporter ();
 				iExporter.Export (this, filename);
-			} catch (Exception) {
-				throw;
+				return true;
+			} catch (Exception e) {
+				Logger.WriteExeption (nameof (AODL), e);
+				return false;
 			}
 		}
 
@@ -528,28 +538,28 @@ namespace AODL.Document.TextDocuments {
 		/// <param name="fontname">The fontname take it from class FontFamilies.</param>
 		public void AddFont (string fontname) {
 			try {
-				Assembly ass = Assembly.GetExecutingAssembly();
-				Stream stream = ass.GetManifestResourceStream("AODL.Resources.OD.fonts.xml");
+				Assembly ass = Assembly.GetExecutingAssembly ();
+				Stream stream = ass.GetManifestResourceStream ("AODL.Resources.OD.fonts.xml");
 
-				XmlDocument fontdoc = new XmlDocument();
+				XmlDocument fontdoc = new XmlDocument ();
 				fontdoc.Load (stream);
 
-				XmlNode exfontnode = this.XmlDoc.SelectSingleNode("/office:document-content/office:font-face-decls/style:font-face[@style:name='"+fontname+"']", this.NamespaceManager);
+				XmlNode exfontnode = this.XmlDoc.SelectSingleNode ("/office:document-content/office:font-face-decls/style:font-face[@style:name='" + fontname + "']", this.NamespaceManager);
 
 				if (exfontnode != null)
 					return; //Font exist;
 
-				XmlNode newfontnode = fontdoc.SelectSingleNode(
-					"/office:document-content/office:font-face-decls/style:font-face[@style:name='"+fontname+"']", this.NamespaceManager);
+				XmlNode newfontnode = fontdoc.SelectSingleNode (
+					"/office:document-content/office:font-face-decls/style:font-face[@style:name='" + fontname + "']", this.NamespaceManager);
 
 				if (newfontnode != null) {
-					XmlNode fontsnode = this.XmlDoc.SelectSingleNode("/office:document-content", this.NamespaceManager);
+					XmlNode fontsnode = this.XmlDoc.SelectSingleNode ("/office:document-content", this.NamespaceManager);
 					if (fontsnode != null) {
 						foreach (XmlNode xn in fontsnode)
 							if (xn.Name == "office:font-face-decls") {
-								XmlNode node = this.CreateNode("font-face", "style");
+								XmlNode node = this.CreateNode ("font-face", "style");
 								foreach (XmlAttribute xa in newfontnode.Attributes) {
-									XmlAttribute xanew = this.CreateAttribute(xa.LocalName, xa.Prefix);
+									XmlAttribute xanew = this.CreateAttribute (xa.LocalName, xa.Prefix);
 									xanew.Value = xa.Value;
 									node.Attributes.Append (xanew);
 								}
@@ -574,11 +584,11 @@ namespace AODL.Document.TextDocuments {
 						if (Math.Abs (diff) < float.Epsilon * 2)
 							pitch = "fixed";
 					}
-					XmlNode fontsnode = this.XmlDoc.SelectSingleNode("/office:document-content", this.NamespaceManager);
+					XmlNode fontsnode = this.XmlDoc.SelectSingleNode ("/office:document-content", this.NamespaceManager);
 					foreach (XmlNode xn in fontsnode)
 						if (xn.Name == "office:font-face-decls") {
 							XmlAttribute xanew;
-							XmlNode node = this.CreateNode("font-face", "style");
+							XmlNode node = this.CreateNode ("font-face", "style");
 
 							xanew = this.CreateAttribute ("name", "style");
 							xanew.Value = fontname;
@@ -755,7 +765,7 @@ namespace AODL.Document.TextDocuments {
 		/// Creates the content body.
 		/// </summary>
 		private void CreateContentBody () {
-			XmlNode nodeText = this.XmlDoc.SelectSingleNode(
+			XmlNode nodeText = this.XmlDoc.SelectSingleNode (
 				TextDocumentHelper.OfficeTextPath, this.NamespaceManager);
 
 			foreach (IContent content in this.Content) {
@@ -772,13 +782,13 @@ namespace AODL.Document.TextDocuments {
 		/// Creates the content of the local style.
 		/// </summary>
 		private void CreateLocalStyleContent () {
-			XmlNode nodeAutomaticStyles = this.XmlDoc.SelectSingleNode(
+			XmlNode nodeAutomaticStyles = this.XmlDoc.SelectSingleNode (
 				TextDocumentHelper.AutomaticStylePath, this.NamespaceManager);
 
 			foreach (IStyle style in this.Styles) {
-				bool exist          = false;
+				bool exist = false;
 				if (style.StyleName != null) {
-					XmlNode node        = nodeAutomaticStyles.SelectSingleNode("style:style[@style:name='"+style.StyleName+"']",
+					XmlNode node = nodeAutomaticStyles.SelectSingleNode ("style:style[@style:name='" + style.StyleName + "']",
 						this.NamespaceManager);
 					if (node != null)
 						exist = true;
@@ -792,12 +802,12 @@ namespace AODL.Document.TextDocuments {
 		/// Creates the content of the common style.
 		/// </summary>
 		private void CreateCommonStyleContent () {
-			XmlNode nodeCommonStyles = this.DocumentStyles.Styles.SelectSingleNode(
+			XmlNode nodeCommonStyles = this.DocumentStyles.Styles.SelectSingleNode (
 				"office:document-styles/office:styles", this.NamespaceManager);
 			nodeCommonStyles.InnerXml = "";
 
 			foreach (IStyle style in this.CommonStyles) {
-				XmlNode nodeStyle   = this.DocumentStyles.Styles.ImportNode(style.Node, true);
+				XmlNode nodeStyle = this.DocumentStyles.Styles.ImportNode (style.Node, true);
 				nodeCommonStyles.AppendChild (nodeStyle);
 			}
 
@@ -829,7 +839,7 @@ namespace AODL.Document.TextDocuments {
 		/// <param name="disposing">if set to <c>true</c> [disposing].</param>
 		private void Dispose (bool disposing) {
 			if (!this._disposed) {
-				if (disposing) 
+				if (disposing)
 					Export.OpenDocument.OpenDocumentTextExporter.CleanUpReadAndWriteDirectories ();
 			}
 			_disposed = true;

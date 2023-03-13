@@ -19,22 +19,18 @@ using System;
 using System.Xml;
 using AODL.Document.Styles;
 
-namespace AODL.Document.Content.Text
-{
+namespace AODL.Document.Content.Text {
 	/// <summary>
 	/// UnknownTextContent represent an unknown text element.
 	/// </summary>
-	public class UnknownTextContent : IText
-	{
+	public class UnknownTextContent : IText {
 		/// <summary>
 		/// Gets the name of the get element.
 		/// </summary>
 		/// <value>The name of the get element.</value>
-		public string GetElementName
-		{
-			get 
-			{
-				if(this.Node != null)
+		public string GetElementName {
+			get {
+				if (this.Node != null)
 					return this.Node.Name;
 				return null;
 			}
@@ -45,10 +41,9 @@ namespace AODL.Document.Content.Text
 		/// </summary>
 		/// <param name="document">The document.</param>
 		/// <param name="node">The node.</param>
-		public UnknownTextContent(IDocument document, XmlNode node)
-		{
-			this.Document			= document;
-			this.Node				= node;
+		public UnknownTextContent (IDocument document, XmlNode node) {
+			this.Document = document;
+			this.Node = node;
 		}
 
 		#region IContent Member
@@ -56,15 +51,12 @@ namespace AODL.Document.Content.Text
 		/// Return null, because the attribute name is unknown.
 		/// </summary>
 		/// <value></value>
-		public string StyleName
-		{
-			get 
-			{ 
+		public string StyleName {
+			get {
 				return null;
 			}
-			set
-			{
-			
+			set {
+
 			}
 		}
 
@@ -72,15 +64,12 @@ namespace AODL.Document.Content.Text
 		/// The text.
 		/// </summary>
 		/// <value></value>
-		public string Text
-		{
-			get
-			{
+		public string Text {
+			get {
 				return this.Node.InnerText;
 			}
-			set
-			{
-				this.Node.InnerText	= value;
+			set {
+				this.Node.InnerText = value;
 			}
 		}
 
@@ -89,14 +78,11 @@ namespace AODL.Document.Content.Text
 		/// Every object (typeof(IContent)) have to know his document.
 		/// </summary>
 		/// <value></value>
-		public IDocument Document
-		{
-			get
-			{
+		public IDocument Document {
+			get {
 				return this._document;
 			}
-			set
-			{
+			set {
 				this._document = value;
 			}
 		}
@@ -107,15 +93,12 @@ namespace AODL.Document.Content.Text
 		/// If no style is available this is null.
 		/// </summary>
 		/// <value></value>
-		public IStyle Style
-		{
-			get
-			{
+		public IStyle Style {
+			get {
 				return this._style;
 			}
-			set
-			{
-				this.StyleName	= value.StyleName;
+			set {
+				this.StyleName = value.StyleName;
 				this._style = value;
 			}
 		}
@@ -125,10 +108,13 @@ namespace AODL.Document.Content.Text
 		/// Gets or sets the node.
 		/// </summary>
 		/// <value>The node.</value>
-		public XmlNode Node
-		{
-			get { return this._node; }
-			set { this._node = value; }
+		public XmlNode Node {
+			get {
+				return this._node;
+			}
+			set {
+				this._node = value;
+			}
 		}
 
 		#endregion

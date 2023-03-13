@@ -32,7 +32,7 @@ namespace AODL.Document.TextDocuments {
 		/// <summary>
 		/// The file name.
 		/// </summary>
-		public static readonly string FileName      = "styles.xml";
+		public static readonly string FileName = "styles.xml";
 		/// <summary>
 		/// XPath to the document office styles
 		/// </summary>
@@ -92,8 +92,8 @@ namespace AODL.Document.TextDocuments {
 		/// </summary>
 		public virtual void New () {
 			try {
-				Assembly ass        = Assembly.GetExecutingAssembly();
-				Stream str          = ass.GetManifestResourceStream("AODL.Resources.OD.styles.xml");
+				Assembly ass = Assembly.GetExecutingAssembly ();
+				Stream str = ass.GetManifestResourceStream ("AODL.Resources.OD.styles.xml");
 				this.Styles = new XmlDocument ();
 				this.Styles.Load (str);
 				MasterPageFactory.FillFromXMLDocument (this.TextDocument);
@@ -173,7 +173,7 @@ namespace AODL.Document.TextDocuments {
 		/// <param name="document">The text document.</param>
 		public void SetOutlineStyle (int outlineLevel, string numFormat, TextDocument document) {
 			try {
-				XmlNode outlineStyleNode        = null;
+				XmlNode outlineStyleNode = null;
 				foreach (IStyle iStyle in document.CommonStyles)
 					if (iStyle.Node.Name == "text:outline-style")
 						outlineStyleNode = iStyle.Node;
@@ -181,19 +181,19 @@ namespace AODL.Document.TextDocuments {
 				//					"//text:outline-style",
 				//					document.NamespaceManager);
 
-				XmlNode outlineLevelNode        = null;
+				XmlNode outlineLevelNode = null;
 				if (outlineStyleNode != null)
 					outlineLevelNode = outlineStyleNode.SelectSingleNode (
 						"text:outline-level-style[@text:level='" + outlineLevel.ToString () + "']",
 						document.NamespaceManager);
 
 				if (outlineLevelNode != null) {
-					XmlNode numberFormatNode    = outlineLevelNode.SelectSingleNode(
+					XmlNode numberFormatNode = outlineLevelNode.SelectSingleNode (
 						"@style:num-format", document.NamespaceManager);
 					if (numberFormatNode != null)
 						numberFormatNode.InnerText = numFormat;
 
-					XmlAttribute xa             = document.CreateAttribute(
+					XmlAttribute xa = document.CreateAttribute (
 						"num-suffix", "style");
 					xa.InnerText = ".";
 					outlineLevelNode.Attributes.Append (xa);
@@ -215,10 +215,26 @@ namespace AODL.Document.TextDocuments {
 		/// </summary>
 		/// <param name="content">The content.</param>
 		/// <param name="document">The document.</param>
-		internal void InsertFooter (Paragraph content, TextDocument document) {
+		/// <param name="MasterStyleName">ABSOLUT notwendig für multiple Seitenvorlagen (MasterStyles)!!! </param>
+		internal void InsertFooter (Paragraph content, TextDocument document, string MasterStyleName) {
 			try {
-				bool exist          = true;
-				XmlNode node        = this._styles.SelectSingleNode("//office:master-styles/style:master-page/style:footer", document.NamespaceManager);//
+				XmlNodeList nodes;
+				XmlAttribute xa;
+				
+				bool exist = true;
+				XmlNode node = this._styles.SelectSingleNode ("//office:master-styles/style:master-page/style:footer", document.NamespaceManager);//
+
+				// 2023-01-26 : diub
+				// Unterstützung für mehr als nur einen MasterStyle!!!!
+				nodes = _styles.SelectNodes ("//office:master-styles/style:master-page", document.NamespaceManager);
+				foreach (XmlNode item in nodes) {
+					xa = item.Attributes ["style:name"];
+					if (xa.Value == MasterStyleName) {
+						node = item.SelectSingleNode ("style:footer", document.NamespaceManager);
+						break;
+					}
+				}
+
 				if (node != null)
 					node.InnerXml = "";
 				else {
@@ -226,7 +242,7 @@ namespace AODL.Document.TextDocuments {
 					exist = false;
 				}
 
-				XmlNode impnode     = this.Styles.ImportNode(content.Node, true);
+				XmlNode impnode = this.Styles.ImportNode (content.Node, true);
 				node.AppendChild (impnode);
 
 				if (!exist)
@@ -243,19 +259,34 @@ namespace AODL.Document.TextDocuments {
 		/// diub - Dipl.-Ing. Uwe Barth 2021-04-25
 		/// public, um einen Paragraphen als Kopzeile einzufügen!!!!
 		/// </summary>
-		/// <param name="content">The content.</param>
-		/// <param name="document">The document.</param>
-		public void InsertHeader (Paragraph content, TextDocument document) {
+		/// <param name="content"></param>
+		/// <param name="document"></param>
+		/// <param name="MasterStyleName">ABSOLUT notwendig für multiple Seitenvorlagen (MasterStyles)!!! </param>
+		public void InsertHeader (Paragraph content, TextDocument document, string MasterStyleName) {
 			try {
-				bool exist          = true;
-				XmlNode node        = this._styles.SelectSingleNode("//office:master-styles/style:master-page/style:header", document.NamespaceManager);//
+				XmlNodeList nodes;
+				XmlAttribute xa;
+
+				bool exist = true;
+				XmlNode node = this._styles.SelectSingleNode ("//office:master-styles/style:master-page/style:header", document.NamespaceManager);
+
+				// 2023-01-26 : diub
+				// Unterstützung für mehr als nur einen MasterStyle!!!!
+				nodes = _styles.SelectNodes ("//office:master-styles/style:master-page", document.NamespaceManager);
+				foreach (XmlNode item in nodes) {
+					xa = item.Attributes ["style:name"];
+					if (xa.Value == MasterStyleName) {
+						node = item.SelectSingleNode ("style:header", document.NamespaceManager);
+						break;
+					}
+				}
 				if (node != null)
 					node.InnerXml = "";
 				else {
 					node = this.CreateNode ("header", "style", document);
 					exist = false;
 				}
-				XmlNode impnode     = this.Styles.ImportNode(content.Node, true);
+				XmlNode impnode = this.Styles.ImportNode (content.Node, true);
 				node.AppendChild (impnode);
 				if (!exist)
 					this._styles.SelectSingleNode ("//office:master-styles/style:master-page",
@@ -319,7 +350,7 @@ namespace AODL.Document.TextDocuments {
 		/// <returns>The XmlNode</returns>
 		public XmlNode CreateNode (string name, string prefix, TextDocument document) {
 			try {
-				string nuri = document.GetNamespaceUri(prefix);
+				string nuri = document.GetNamespaceUri (prefix);
 				return this.Styles.CreateElement (prefix, name, nuri);
 			} catch (Exception) {
 				throw;

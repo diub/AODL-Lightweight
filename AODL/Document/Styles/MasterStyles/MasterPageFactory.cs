@@ -29,13 +29,13 @@ namespace AODL.Document.Styles.MasterStyles {
 		/// <param name="textDocument">The owner text document.</param>
 		public static void FillFromXMLDocument (TextDocument textDocument) {
 			try {
-				TextMasterPageCollection txtMPCollection = new TextMasterPageCollection();
-				XmlNodeList masterPageNodes = textDocument.DocumentStyles.Styles.SelectNodes(
+				TextMasterPageCollection txtMPCollection = new TextMasterPageCollection ();
+				XmlNodeList masterPageNodes = textDocument.DocumentStyles.Styles.SelectNodes (
 					"//style:master-page", textDocument.NamespaceManager);
 				if (masterPageNodes != null) {
 					foreach (XmlNode mpNode in masterPageNodes) {
 						// Build the master page
-						TextMasterPage txtMasterPage = new TextMasterPage(textDocument, mpNode);
+						TextMasterPage txtMasterPage = new TextMasterPage (textDocument, mpNode);
 						// Even if there is no usage of header within the master page style,
 						// but of course there exists the header:style node, so we create
 						// the TextPageHeader.
@@ -48,26 +48,26 @@ namespace AODL.Document.Styles.MasterStyles {
 						txtMasterPage.TextPageFooter.TextMasterPage = txtMasterPage;
 
 						// Build header content
-						XmlNode headerNode = mpNode.SelectSingleNode("//style:header", textDocument.NamespaceManager);
+						XmlNode headerNode = mpNode.SelectSingleNode ("//style:header", textDocument.NamespaceManager);
 						if (headerNode != null) {
 							txtMasterPage.TextPageHeader.ContentNode = headerNode;
 						}
 
 						// Build master page layout
-						XmlNode txtPageLayoutNode = textDocument.DocumentStyles.Styles.SelectSingleNode(
-							"//style:page-layout[@style:name='"+txtMasterPage.PageLayoutName+"']",
+						XmlNode txtPageLayoutNode = textDocument.DocumentStyles.Styles.SelectSingleNode (
+							"//style:page-layout[@style:name='" + txtMasterPage.PageLayoutName + "']",
 							textDocument.NamespaceManager);
 						if (txtPageLayoutNode != null) {
 							// Build master page layout properties
-							XmlNode txtPageLayoutPropNode = txtPageLayoutNode.SelectSingleNode(
+							XmlNode txtPageLayoutPropNode = txtPageLayoutNode.SelectSingleNode (
 								"//style:page-layout-properties", textDocument.NamespaceManager);
 							if (txtPageLayoutPropNode != null) {
-								TextPageLayout txtPageLayout = new TextPageLayout(
+								TextPageLayout txtPageLayout = new TextPageLayout (
 									textDocument, txtPageLayoutNode, txtPageLayoutPropNode);
 								txtMasterPage.TextPageLayout = txtPageLayout;
 							}
 							// Build master page header layout
-							XmlNode txtHeaderStyleNode = txtPageLayoutNode.SelectSingleNode(
+							XmlNode txtHeaderStyleNode = txtPageLayoutNode.SelectSingleNode (
 								"//style:header-style", textDocument.NamespaceManager);
 							if (txtHeaderStyleNode != null) {
 								txtMasterPage.TextPageHeader.StyleNode = txtHeaderStyleNode;
@@ -76,7 +76,7 @@ namespace AODL.Document.Styles.MasterStyles {
 									txtMasterPage.TextPageHeader.PropertyNode = txtHeaderStyleNode.FirstChild;
 							}
 							// Build master page footer layout
-							XmlNode txtFooterStyleNode = txtPageLayoutNode.SelectSingleNode(
+							XmlNode txtFooterStyleNode = txtPageLayoutNode.SelectSingleNode (
 								"//style:footer-style", textDocument.NamespaceManager);
 							if (txtFooterStyleNode != null) {
 								txtMasterPage.TextPageFooter.StyleNode = txtFooterStyleNode;

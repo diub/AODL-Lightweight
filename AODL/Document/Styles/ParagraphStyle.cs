@@ -15,11 +15,8 @@
  * 
  */
 
-using System;
-using System.Xml;
 using AODL.Document.Styles.Properties;
-using AODL.Document;
-using AODL.Document.Content;
+using System.Xml;
 
 namespace AODL.Document.Styles {
 	/// <summary>
@@ -35,7 +32,7 @@ namespace AODL.Document.Styles {
 				foreach (IProperty property in this.PropertyCollection)
 					if (property is ParagraphProperties)
 						return (ParagraphProperties) property;
-				ParagraphProperties parProperties   = new ParagraphProperties(this);
+				ParagraphProperties parProperties = new ParagraphProperties (this);
 				this.PropertyCollection.Add ((IProperty) parProperties);
 				return parProperties;
 			}
@@ -43,6 +40,24 @@ namespace AODL.Document.Styles {
 				if (this.PropertyCollection.Contains ((IProperty) value))
 					this.PropertyCollection.Remove ((IProperty) value);
 				this.PropertyCollection.Add (value);
+			}
+		}
+
+		/// <summary>
+		/// 2023-01-25 : diub
+		/// </summary>
+		public string MasterPageName {
+			get {
+				XmlNode xn = this._node.SelectSingleNode ("@style:master-page-name", this.Document.NamespaceManager);
+				if (xn != null)
+					return xn.InnerText;
+				return null;
+			}
+			set {
+				XmlNode xn = this._node.SelectSingleNode ("@style:master-page-name", this.Document.NamespaceManager);
+				if (xn == null)
+					this.CreateAttribute ("master-page-name", value, "style");
+				this._node.SelectSingleNode ("@style:master-page-name", this.Document.NamespaceManager).InnerText = value;
 			}
 		}
 
@@ -55,7 +70,7 @@ namespace AODL.Document.Styles {
 				foreach (IProperty property in this.PropertyCollection)
 					if (property is TextProperties)
 						return (TextProperties) property;
-				TextProperties textProperties   = new TextProperties(this);
+				TextProperties textProperties = new TextProperties (this);
 				this.PropertyCollection.Add ((IProperty) textProperties);
 				return textProperties;
 			}
@@ -71,14 +86,14 @@ namespace AODL.Document.Styles {
 		/// </summary>
 		public string ParentStyle {
 			get {
-				XmlNode xn  = this._node.SelectSingleNode("@style:parent-style-name",
+				XmlNode xn = this._node.SelectSingleNode ("@style:parent-style-name",
 					this.Document.NamespaceManager);
 				if (xn != null)
 					return xn.InnerText;
 				return null;
 			}
 			set {
-				XmlNode xn = this._node.SelectSingleNode("@style:parent-style-name",
+				XmlNode xn = this._node.SelectSingleNode ("@style:parent-style-name",
 					this.Document.NamespaceManager);
 				if (xn == null)
 					this.CreateAttribute ("parent-style-name", value, "style");
@@ -92,14 +107,14 @@ namespace AODL.Document.Styles {
 		/// </summary>
 		public string ListStyleName {
 			get {
-				XmlNode xn = this._node.SelectSingleNode("@style:list-style-name",
+				XmlNode xn = this._node.SelectSingleNode ("@style:list-style-name",
 					this.Document.NamespaceManager);
 				if (xn != null)
 					return xn.InnerText;
 				return null;
 			}
 			set {
-				XmlNode xn = this._node.SelectSingleNode("@style:list-style-name",
+				XmlNode xn = this._node.SelectSingleNode ("@style:list-style-name",
 					this.Document.NamespaceManager);
 				if (xn == null)
 					this.CreateAttribute ("list-style-name", value, "style");
@@ -146,7 +161,7 @@ namespace AODL.Document.Styles {
 		/// <param name="name">The style name.</param>
 		private void NewXmlNode (string name) {
 			this.Node = this.Document.CreateNode ("style", "style");
-			XmlAttribute xa = this.Document.CreateAttribute("name", "style");
+			XmlAttribute xa = this.Document.CreateAttribute ("name", "style");
 			xa.Value = name;
 			this.Node.Attributes.Append (xa);
 			xa = this.Document.CreateAttribute ("family", "style");
@@ -164,7 +179,7 @@ namespace AODL.Document.Styles {
 		/// <param name="text">The attribute value.</param>
 		/// <param name="prefix">The namespace prefix.</param>
 		private void CreateAttribute (string name, string text, string prefix) {
-			XmlAttribute xa = this.Document.CreateAttribute(name, prefix);
+			XmlAttribute xa = this.Document.CreateAttribute (name, prefix);
 			xa.Value = text;
 			this.Node.Attributes.Append (xa);
 		}
@@ -192,14 +207,14 @@ namespace AODL.Document.Styles {
 		/// <value></value>
 		public string StyleName {
 			get {
-				XmlNode xn = this._node.SelectSingleNode("@style:name",
+				XmlNode xn = this._node.SelectSingleNode ("@style:name",
 					this.Document.NamespaceManager);
 				if (xn != null)
 					return xn.InnerText;
 				return null;
 			}
 			set {
-				XmlNode xn = this._node.SelectSingleNode("@style:name",
+				XmlNode xn = this._node.SelectSingleNode ("@style:name",
 					this.Document.NamespaceManager);
 				if (xn == null)
 					this.CreateAttribute ("name", value, "style");

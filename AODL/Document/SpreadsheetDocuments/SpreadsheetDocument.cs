@@ -38,7 +38,7 @@ namespace AODL.Document.SpreadsheetDocuments {
 	/// spreadsheet document.
 	/// </summary>
 	public class SpreadsheetDocument : IDocument, IDisposable {
-		private int _tableCount     = 0;
+		private int _tableCount = 0;
 		/// <summary>
 		/// Gets the table count.
 		/// </summary>
@@ -252,7 +252,7 @@ namespace AODL.Document.SpreadsheetDocuments {
 			}
 		}
 
-		private string _mimeTyp     = "application/vnd.oasis.opendocument.spreadsheet";
+		private string _mimeTyp = "application/vnd.oasis.opendocument.spreadsheet";
 		/// <summary>
 		/// Gets the MIME typ.
 		/// </summary>
@@ -325,11 +325,11 @@ namespace AODL.Document.SpreadsheetDocuments {
 		/// Reads the common styles.
 		/// </summary>
 		private void ReadCommonStyles () {
-			OpenDocumentImporter odImporter = new OpenDocumentImporter();
+			OpenDocumentImporter odImporter = new OpenDocumentImporter ();
 			odImporter._document = this;
 			odImporter.ImportCommonStyles ();
 
-			LocalStyleProcessor lsp         = new LocalStyleProcessor(this, true);
+			LocalStyleProcessor lsp = new LocalStyleProcessor (this, true);
 			lsp.ReadStyles ();
 		}
 
@@ -337,15 +337,16 @@ namespace AODL.Document.SpreadsheetDocuments {
 		/// Save the SpreadsheetDocument as OpenDocument spreadsheet document
 		/// </summary>
 		/// <param name="filename">The filename. With or without full path. Without will save the file to application path!</param>
-		public void SaveTo (string filename) {
+		public bool SaveTo (string filename) {
 			try {
 				this.CreateContentBody ();
 
 				//diub - Dipl.-Ing. Uwe Barth 2021-04-20
 				IExporter iExporter = new OpenDocumentTextExporter ();
 				iExporter.Export (this, filename);
+				return true;
 			} catch (Exception) {
-				throw;
+				return false;
 			}
 		}
 
@@ -375,8 +376,8 @@ namespace AODL.Document.SpreadsheetDocuments {
 
 				this.NamespaceManager = TextDocumentHelper.NameSpace (this._xmldoc.NameTable);
 
-				ImportHandler importHandler     = new ImportHandler();
-				IImporter importer              = importHandler.GetFirstImporter(DocumentTypes.SpreadsheetDocument, file);
+				ImportHandler importHandler = new ImportHandler ();
+				IImporter importer = importHandler.GetFirstImporter (DocumentTypes.SpreadsheetDocument, file);
 
 				if (importer != null) {
 					if (importer.NeedNewOpenDocument)
@@ -390,7 +391,7 @@ namespace AODL.Document.SpreadsheetDocuments {
 									if (((AODLWarning) ob).Message != null)
 										Console.WriteLine ("Err: {0}", ((AODLWarning) ob).Message);
 									if (((AODLWarning) ob).Node != null) {
-										XmlTextWriter writer    = new XmlTextWriter(Console.Out);
+										XmlTextWriter writer = new XmlTextWriter (Console.Out);
 										writer.Formatting = Formatting.Indented;
 										((AODLWarning) ob).Node.WriteContentTo (writer);
 									}
@@ -412,7 +413,7 @@ namespace AODL.Document.SpreadsheetDocuments {
 		public XmlNode CreateNode (string name, string prefix) {
 			if (this.XmlDoc == null)
 				throw new NullReferenceException ("There is no XmlDocument loaded. Couldn't create Node " + name + " with Prefix " + prefix + ". " + this.GetType ().ToString ());
-			string nuri = this.GetNamespaceUri(prefix);
+			string nuri = this.GetNamespaceUri (prefix);
 			return this.XmlDoc.CreateElement (prefix, name, nuri);
 		}
 
@@ -425,7 +426,7 @@ namespace AODL.Document.SpreadsheetDocuments {
 		public XmlAttribute CreateAttribute (string name, string prefix) {
 			if (this.XmlDoc == null)
 				throw new NullReferenceException ("There is no XmlDocument loaded. Couldn't create Attribue " + name + " with Prefix " + prefix + ". " + this.GetType ().ToString ());
-			string nuri = this.GetNamespaceUri(prefix);
+			string nuri = this.GetNamespaceUri (prefix);
 			return this.XmlDoc.CreateAttribute (prefix, name, nuri);
 		}
 
@@ -446,8 +447,8 @@ namespace AODL.Document.SpreadsheetDocuments {
 		/// </summary>
 		private void LoadBlankContent () {
 			try {
-				Assembly ass            = Assembly.GetExecutingAssembly();
-				Stream str              = ass.GetManifestResourceStream("AODL.Resources.OD.spreadsheetcontent.xml");
+				Assembly ass = Assembly.GetExecutingAssembly ();
+				Stream str = ass.GetManifestResourceStream ("AODL.Resources.OD.spreadsheetcontent.xml");
 				this._xmldoc = new XmlDocument ();
 				this._xmldoc.Load (str);
 			} catch (Exception) {
@@ -503,7 +504,7 @@ namespace AODL.Document.SpreadsheetDocuments {
 		/// Creates the content body.
 		/// </summary>
 		private void CreateContentBody () {
-			XmlNode nodeSpreadSheets        = this.XmlDoc.SelectSingleNode(
+			XmlNode nodeSpreadSheets = this.XmlDoc.SelectSingleNode (
 				"/office:document-content/office:body/office:spreadsheet", this.NamespaceManager);
 
 			foreach (IContent iContent in this.Content) {
@@ -520,7 +521,7 @@ namespace AODL.Document.SpreadsheetDocuments {
 		/// Creates the content of the local style.
 		/// </summary>
 		private void CreateLocalStyleContent () {
-			XmlNode nodeAutomaticStyles     = this.XmlDoc.SelectSingleNode(
+			XmlNode nodeAutomaticStyles = this.XmlDoc.SelectSingleNode (
 				"/office:document-content/office:automatic-styles", this.NamespaceManager);
 
 			foreach (IStyle style in this.Styles)
@@ -531,12 +532,12 @@ namespace AODL.Document.SpreadsheetDocuments {
 		/// Creates the content of the common style.
 		/// </summary>
 		private void CreateCommonStyleContent () {
-			XmlNode nodeCommonStyles        = this.DocumentStyles.Styles.SelectSingleNode(
+			XmlNode nodeCommonStyles = this.DocumentStyles.Styles.SelectSingleNode (
 				"office:document-styles/office:styles", this.NamespaceManager);
 			nodeCommonStyles.InnerXml = "";
 
 			foreach (IStyle style in this.CommonStyles) {
-				XmlNode nodeStyle           = this.DocumentStyles.Styles.ImportNode(style.Node, true);
+				XmlNode nodeStyle = this.DocumentStyles.Styles.ImportNode (style.Node, true);
 				nodeCommonStyles.AppendChild (nodeStyle);
 			}
 
@@ -554,8 +555,8 @@ namespace AODL.Document.SpreadsheetDocuments {
 		/// <param name="styleName">Name of the style.</param>
 		/// <returns></returns>
 		private bool StyleNodeExists (string styleName) {
-			XmlNode styleNode               = this.XmlDoc.SelectSingleNode(
-				"/office:document-content/office:automatic-styles/style:style[@style:name='"+styleName+"']", this.NamespaceManager);
+			XmlNode styleNode = this.XmlDoc.SelectSingleNode (
+				"/office:document-content/office:automatic-styles/style:style[@style:name='" + styleName + "']", this.NamespaceManager);
 
 			if (styleNode == null)
 				return false;

@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright ("Original code: Lars Behrmann, 2005, Mods: diub - Dipl.-Ing. Uwe Barth 2021")]
+[assembly: AssemblyCopyright ("Original code: Lars Behrmann, 2005, Mods: 2021-2023 diub - Dipl.-Ing. Uwe Barth")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]	
 
@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 // Sie können alle Werte oder die standardmäßige Revision und Buildnummer 
 // mit '*' angeben:
 
-[assembly: AssemblyVersion ("1.3.0.0")]
+[assembly: AssemblyVersion ("1.3.0.*")]
 
 //
 // Um die Assembly zu signieren, müssen Sie einen Schlüssel angeben. Weitere Informationen 
@@ -56,3 +56,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDelaySign(false)]
 [assembly: AssemblyKeyFile("")]
 [assembly: AssemblyKeyName("")]
+[assembly: AssemblyFileVersion ("1.3.0.2")]

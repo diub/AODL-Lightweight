@@ -19,6 +19,7 @@ using AODL.Document.Content.Draw;
 using AODL.Document.Exceptions;
 using AODL.Document.Import.OpenDocument;
 using AODL.Document.TextDocuments;
+using diub.Log;
 using ICSharpCode.SharpZipLib.Zip;
 using System;
 using System.Collections;
@@ -32,10 +33,15 @@ namespace AODL.Document.Export.OpenDocument {
 	/// of documents in the OpenDocument format.
 	/// </summary>
 	public class OpenDocumentTextExporter : IExporter, IPublisherInfo {
-		internal static Guid folderGuid         = Guid.NewGuid();
-		private static readonly string dir      = Environment.CurrentDirectory+@"\"+folderGuid.ToString()+@"\";
-		private string[] _directories           = {"Configurations2", "META-INF", "Pictures", "Thumbnails"};
-		private IDocument _document             = null;
+		internal static Guid folderGuid = Guid.NewGuid ();
+
+		// 2022-09-02 - 12.40.24 diub
+		// Temporary files shoud be handled in the "temporary files folder" !!!
+		//private static readonly string dir      = Environment.CurrentDirectory+@"\"+folderGuid.ToString()+@"\";
+		private static readonly string dir = (System.IO.Path.GetTempPath () + @"\AODL-Lightweight\" + folderGuid.ToString () + @"\").Replace ("\\\\", "\\");
+
+		private string [] _directories = { "Configurations2", "META-INF", "Pictures", "Thumbnails" };
+		private IDocument _document = null;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="OpenDocumentTextExporter"/> class.
@@ -49,7 +55,7 @@ namespace AODL.Document.Export.OpenDocument {
 
 			this.Author = "Lars Behrmann, lb@OpenDocument4all.com";
 			this.InfoUrl = "http://AODL.OpenDocument4all.com";
-			this.Description= "This the standard OpenDocument format exporter of the OpenDocument library AODL.";
+			this.Description = "This the standard OpenDocument format exporter of the OpenDocument library AODL.";
 		}
 
 		#region IExporter Member
@@ -111,7 +117,7 @@ namespace AODL.Document.Export.OpenDocument {
 				CreateOpenDocument (filename, dir);
 				//Clean up resources
 				//this.CleanUpDirectory(dir);
-			} catch (Exception) {
+			} catch (Exception e) {
 				throw;
 			}
 		}
@@ -139,7 +145,7 @@ namespace AODL.Document.Export.OpenDocument {
 		private void WriteSingleFiles (System.Xml.XmlDocument document, string filename) {
 			try {
 				//document.Save(filename);
-				XmlTextWriter writer = new XmlTextWriter(filename, System.Text.Encoding.UTF8);
+				XmlTextWriter writer = new XmlTextWriter (filename, System.Text.Encoding.UTF8);
 				writer.Formatting = Formatting.None;
 				document.WriteContentTo (writer);
 				writer.Flush ();
@@ -186,7 +192,7 @@ namespace AODL.Document.Export.OpenDocument {
 		/// <param name="directory">The directory to zip.</param>
 		private static void CreateOpenDocument (string filename, string directory) {
 			try {
-				FastZip fz = new FastZip();
+				FastZip fz = new FastZip ();
 				fz.CreateEmptyDirectories = true;
 				fz.CreateZip (filename, directory, true, "");
 				fz = null;
@@ -222,7 +228,7 @@ namespace AODL.Document.Export.OpenDocument {
 			try {
 				if (File.Exists (file))
 					File.Delete (file);
-				StreamWriter sw = File.CreateText(file);
+				StreamWriter sw = File.CreateText (file);
 				if (this._document is AODL.Document.TextDocuments.TextDocument) {
 					sw.WriteLine ("application/vnd.oasis.opendocument.text");
 				} else if (this._document is AODL.Document.SpreadsheetDocuments.SpreadsheetDocument) {
@@ -234,41 +240,11 @@ namespace AODL.Document.Export.OpenDocument {
 			}
 		}
 
-		#region old code Todo: Delete
-		//		/// <summary>
-		//		/// Cleans the up directory.
-		//		/// </summary>
-		//		/// <param name="directory">The directory.</param>
-		//		private void CleanUpDirectory(string directory)
-		//		{
-		//			string dirpics	= Environment.CurrentDirectory+@"\PicturesRead\";
-		//
-		//			try
-		//			{
-		//				foreach(string d in this._directories)
-		//					Directory.Delete(directory+@"\"+d, true);
-		//
-		////				if(Directory.Exists(OpenDocumentTextImporter.dirpics))
-		////					Directory.Delete(OpenDocumentTextImporter.dirpics, true);
-		//				if(Directory.Exists(dirpics))
-		//					Directory.Delete(dirpics, true);
-		//
-		//				File.Delete(directory+DocumentMetadata.FileName);
-		//				File.Delete(directory+DocumentSetting.FileName);
-		//				File.Delete(directory+DocumentStyles.FileName);
-		//				File.Delete(directory+"content.xml");
-		//			}
-		//			catch(Exception)
-		//			{
-		//				throw;
-		//			}
-		//		}
-		#endregion
-
 		/// <summary>
 		/// Cleans the up read and write directories.
 		/// </summary>
 		internal static void CleanUpReadAndWriteDirectories () {
+			Logger.Write (MsgLogLevel.System, nameof (AODL), nameof (CleanUpReadAndWriteDirectories));
 			try {
 				if (Directory.Exists (OpenDocumentImporter.dir))
 					Directory.Delete (OpenDocumentImporter.dir, true);
@@ -277,7 +253,8 @@ namespace AODL.Document.Export.OpenDocument {
 				if (Directory.Exists (OpenDocumentTextExporter.dir))
 					Directory.Delete (OpenDocumentTextExporter.dir, true);
 			} catch (Exception e) {
-				AODLWarning aodlWarning             = new AODLWarning("An exception ouccours while trying to remove the temp read directories.");
+				// 2023-02-21 diub
+				AODLWarning aodlWarning = new AODLWarning ("An exception ouccours while trying to remove the temp read directories.");
 				aodlWarning.InMethod = AODLException.GetExceptionSourceInfo (new StackFrame (1, true));
 				aodlWarning.OriginalException = e;
 				throw e;
@@ -333,13 +310,13 @@ namespace AODL.Document.Export.OpenDocument {
 		/// <param name="directory">The directory.</param>
 		private static void CopyGraphics (IDocument document, string directory) {
 			try {
-				string picturedir       = directory+@"\Pictures\";
+				string picturedir = directory + @"\Pictures\";
 
 				foreach (Graphic graphic in document.Graphics) {
 					if (graphic.GraphicRealPath != null) {
 						//Loaded or added
 						if (graphic.GraphicFileName == null) {
-							FileInfo fInfo  = new FileInfo(graphic.GraphicRealPath);
+							FileInfo fInfo = new FileInfo (graphic.GraphicRealPath);
 							if (!File.Exists (picturedir + fInfo.Name))
 								File.Copy (graphic.GraphicRealPath, picturedir + fInfo.Name);
 						} else

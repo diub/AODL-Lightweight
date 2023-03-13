@@ -124,7 +124,7 @@ namespace AODL.Document {
 		/// Save the document at the given file position.
 		/// </summary>
 		/// <param name="filename">Path and file name.</param>
-		void SaveTo (string filename);
+		bool SaveTo (string filename);
 		/// <summary>
 		/// Save the document by using the passed IExporter
 		/// with the passed file name.

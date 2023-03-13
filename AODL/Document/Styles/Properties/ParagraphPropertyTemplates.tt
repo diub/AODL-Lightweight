@@ -1,0 +1,130 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+
+/*
+ * http://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part1.html#__RefHeading__1419828_253892949
+*/
+
+/*
+ * License: 
+ * GNU Lesser General Public License. You should recieve a
+ * copy of this within the library. If not you will find
+ * a whole copy at http://www.gnu.org/licenses/lgpl.html .
+ * 
+ * Author:
+ * Copyright 2023, diub - Dipl.-Ing. Uwe Barth, diub@diub.de
+ * 
+ */
+
+using System.ComponentModel;
+using System.Xml;
+
+namespace AODL.Document.Styles.Properties {
+
+public partial class ParagraphProperties : IProperty {
+
+	/// <summary>
+	/// 2023-01-21: diub
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="Name"></param>
+	/// <param name="Value"></param>
+	private void SetProperty<T> (string Name, T Value) {
+		string fo;
+
+		fo = "@fo:" + Name;
+		XmlNode xn = this._node.SelectSingleNode (fo, this.Style.Document.NamespaceManager);
+		if (xn == null)
+			this.CreateAttribute (Name, Value.ToString (), "fo");
+		this._node.SelectSingleNode (fo, this.Style.Document.NamespaceManager).InnerText = Value.ToString ();
+	}
+
+	/// <summary>
+	/// 2023-01-21: diub
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="Name"></param>
+	/// <param name="DefaultValue"></param>
+	/// <returns></returns>
+	private T GetProperty<T> (string Name, T DefaultValue) {
+		string fo;
+		TypeConverter tc;
+
+		fo = "@fo:" + Name;
+		XmlNode xn = this._node.SelectSingleNode (fo, this.Style.Document.NamespaceManager);
+		if (xn != null) {
+			tc = TypeDescriptor.GetConverter (typeof (T));
+			return (T) tc.ConvertTo (xn.InnerText, typeof (T));
+		}
+		return DefaultValue;
+
+	}
+
+<#
+string [] [] properties = new string [] [] {
+	new string[] {"MarginTop", "string", "null" },
+	new string[] {"MarginRight", "string", "null" },
+	new string[] {"MarginBottom", "string", "null" },
+	new string[] {"MarginLeft", "string", "null" },
+
+	new string[] {"BreakBefore", "string", "null" },
+	new string[] {"BreakAfter", "string", "null" },
+	new string[] {"Border", "string", "null" },
+	new string[] {"BackgroundColor", "string", "null" },
+	new string[] {"Padding", "string", "null" },
+
+	new string[] {"LineHeight", "string", "null" },
+	new string[] {"TextAlign", "string", "null", "start (default), end, center, justify" },
+
+	new string[] {"Orphans", "int", "0", "Hurenkinder" },
+	new string[] {"Widows", "int", "0", "Schusterjungen" },
+	new string[] {"KeepWithNext", "string", "null", "Auto (default), Always" },
+
+};
+
+string property_name, odt_name, type, def, hints;
+
+string OdtName(string PropertyName) {
+	char ch;
+	string str;
+
+	str = ("" + PropertyName[0]).ToLower();
+	for (int i=1; i<PropertyName.Length; i++) {
+		ch = PropertyName[i];
+		if (char.IsUpper(ch))
+			str += "-";
+		str += char.ToLower(ch);
+	}
+	return str;
+}
+
+foreach (string [] item in properties) { 
+	property_name = item[0];
+	odt_name = OdtName (item[0]);
+	type = item[1];
+	def = item[2];
+	hints = "";
+	if (item.Length>3) hints = item[3];
+#>
+	/// <summary>
+	/// <#=hints#>
+	/// </summary>
+	public <#=type#> <#=property_name#> {
+		set {
+			SetProperty<<#=type#>> ("<#=odt_name#>", value); 
+		}
+		get {
+			return GetProperty<<#=type#>> ("<#=odt_name#>", <#=def#>); 
+		}
+	}
+
+<#
+}
+#>
+
+}	// class
+
+} //	namespace	2023-01-21 - 16.28.51
+

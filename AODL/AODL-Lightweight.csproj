@@ -66,6 +66,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
@@ -88,10 +89,13 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.SharpZipLib">
-      <Name>ICSharpCode.SharpZipLib</Name>
-      <HintPath>Resources\ICSharpCode.SharpZipLib.dll</HintPath>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\DLLs\AllCPU\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -222,6 +226,7 @@
     <Compile Include="Document\Content\Text\References\PageCount.cs" />
     <Compile Include="Document\Content\Text\References\PageNumber.cs" />
     <Compile Include="Document\Content\Text\References\PageRef.cs" />
+    <Compile Include="Document\Content\Text\TextControl\PageBreak.cs" />
     <Compile Include="Document\Content\Text\TextList.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -238,9 +243,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Document\Content\Text\SimpleText.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Document\Content\Text\TextBuilder.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Document\Content\Text\TextControl\LineBreak.cs">
@@ -396,6 +398,11 @@
     <Compile Include="Document\Styles\Properties\ParagraphProperties.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Document\Styles\Properties\ParagraphPropertyTemplates.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ParagraphPropertyTemplates.tt</DependentUpon>
+    </Compile>
     <Compile Include="Document\Styles\Properties\RowProperties.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -465,8 +472,11 @@
     <Compile Include="Document\TextDocuments\TextDocumentHelper.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Content Include="Document\Styles\Properties\ParagraphPropertyTemplates.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ParagraphPropertyTemplates.cs</LastGenOutput>
+    </Content>
     <Content Include="Resources\ChangeLog.txt" />
-    <Content Include="Resources\ICSharpCode.SharpZipLib.dll" />
     <Content Include="Resources\License.txt" />
     <Content Include="Resources\OD\content.xml" />
     <EmbeddedResource Include="Resources\OD\tweakcontent.xsl" />
@@ -497,6 +507,15 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Documenter\Documenter_0.8.0.47\diub\Log\Log.csproj">
+      <Project>{890fb0ed-70bd-44af-a56f-af1e07a23846}</Project>
+      <Name>Log</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

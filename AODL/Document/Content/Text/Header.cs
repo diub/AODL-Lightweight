@@ -43,13 +43,13 @@ namespace AODL.Document.Content.Text {
 		/// <value>The out line level.</value>
 		public string OutLineLevel {
 			get {
-				XmlNode xn = this._node.SelectSingleNode("@text:outline-level", this.Document.NamespaceManager);
+				XmlNode xn = this._node.SelectSingleNode ("@text:outline-level", this.Document.NamespaceManager);
 				if (xn != null)
 					return xn.InnerText;
 				return null;
 			}
 			set {
-				XmlNode xn = this._node.SelectSingleNode("@text:outline-level", this.Document.NamespaceManager);
+				XmlNode xn = this._node.SelectSingleNode ("@text:outline-level", this.Document.NamespaceManager);
 				if (xn == null)
 					this.CreateAttribute ("outline-level", value, "text");
 				this._node.SelectSingleNode ("@text:outline-level", this.Document.NamespaceManager).InnerText = value;
@@ -102,7 +102,7 @@ namespace AODL.Document.Content.Text {
 		/// <param name="text">The attribute value.</param>
 		/// <param name="prefix">The namespace prefix.</param>
 		private void CreateAttribute (string name, string text, string prefix) {
-			XmlAttribute xa = this.Document.CreateAttribute(name, prefix);
+			XmlAttribute xa = this.Document.CreateAttribute (name, prefix);
 			xa.Value = text;
 			this.Node.Attributes.Append (xa);
 		}
@@ -135,24 +135,29 @@ namespace AODL.Document.Content.Text {
 				return "Heading_20_9";
 			else if (heading == Headings.Heading_20_10)
 				return "Heading_20_10";
+			// 2022-02-02 diub
+			else if (heading == Headings.Heading_20_11)
+				return "Heading_20_11";
+			// 2023-01-26 : diub
+			else if (heading == Headings.Heading_20_0)
+				return "Heading_20_0";
 			else
 				return "Heading";
 		}
 
-		#region IContent Member
 		/// <summary>
 		/// Gets or sets the name of the style.
 		/// </summary>
 		/// <value>The name of the style.</value>
 		public string StyleName {
 			get {
-				XmlNode xn = this._node.SelectSingleNode("@text:style-name", this.Document.NamespaceManager);
+				XmlNode xn = this._node.SelectSingleNode ("@text:style-name", this.Document.NamespaceManager);
 				if (xn != null)
 					return xn.InnerText;
 				return null;
 			}
 			set {
-				XmlNode xn = this._node.SelectSingleNode("@text:style-name", this.Document.NamespaceManager);
+				XmlNode xn = this._node.SelectSingleNode ("@text:style-name", this.Document.NamespaceManager);
 				if (xn == null)
 					this.CreateAttribute ("style-name", value, "text");
 				this._node.SelectSingleNode ("@text:style-name", this.Document.NamespaceManager).InnerText = value;
@@ -189,7 +194,17 @@ namespace AODL.Document.Content.Text {
 			}
 		}
 
+		//public HeaderStyle HeaderStyle {
+		//	get {
+		//		return (HeaderStyle) this.Style;
+		//	}
+		//	set {
+		//		this.Style = value;
+		//	}
+		//}
+
 		private XmlNode _node;
+
 		/// <summary>
 		/// Gets or sets the node.
 		/// </summary>
@@ -203,7 +218,6 @@ namespace AODL.Document.Content.Text {
 			}
 		}
 
-		#endregion
 
 		/// <summary>
 		/// Append the xml from added IText object.
@@ -216,9 +230,9 @@ namespace AODL.Document.Content.Text {
 			if (((IText) value).Text != null) {
 				try {
 					if (this.Document is AODL.Document.TextDocuments.TextDocument) {
-						string text     = ((IText)value).Text;
+						string text = ((IText) value).Text;
 						this.Document.DocumentMetadata.CharacterCount += text.Length;
-						string[] words  = text.Split(' ');
+						string [] words = text.Split (' ');
 						this.Document.DocumentMetadata.WordCount += words.Length;
 					}
 				} catch (Exception) {
@@ -236,11 +250,8 @@ namespace AODL.Document.Content.Text {
 			this.Node.RemoveChild (((IText) value).Node);
 		}
 
-
-
-		#region ITextContainer Member
-
 		private ITextCollection _textContent;
+
 		/// <summary>
 		/// All Content objects have a Text container. Which represents
 		/// his Text this could be SimpleText, FormatedText or mixed.
@@ -263,10 +274,6 @@ namespace AODL.Document.Content.Text {
 			}
 		}
 
-		#endregion
-
-		#region ICloneable Member
-
 		/// <summary>
 		/// Create a deep clone of this Header object.
 		/// </summary>
@@ -275,17 +282,15 @@ namespace AODL.Document.Content.Text {
 		/// A clone of this object.
 		/// </returns>
 		public object Clone () {
-			Header headerClone          = null;
+			Header headerClone = null;
 
 			if (this.Document != null && this.Node != null) {
-				MainContentProcessor mcp    = new MainContentProcessor(this.Document);
+				MainContentProcessor mcp = new MainContentProcessor (this.Document);
 				headerClone = mcp.CreateHeader (this.Node.CloneNode (true));
 			}
-
 			return headerClone;
 		}
 
-		#endregion
 	}
 
 	/// <summary>
@@ -297,7 +302,7 @@ namespace AODL.Document.Content.Text {
 		/// </summary>
 		Heading,
 		/// <summary>
-		/// Heading 1
+		/// Heading 
 		/// </summary>
 		Heading_20_1,
 		/// <summary>
@@ -335,7 +340,15 @@ namespace AODL.Document.Content.Text {
 		/// <summary>
 		/// Heading 10
 		/// </summary>
-		Heading_20_10
+		Heading_20_10,
+		/// <summary>
+		/// Spezial: Heading 1 ohne Seitenwechsel
+		/// </summary>
+		Heading_20_11,
+		/// <summary>
+		/// Heading 0: Erstes Heading mit Seitenzahl "1".
+		/// </summary>
+		Heading_20_0,
 	}
 }
 

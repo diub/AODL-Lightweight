@@ -15,13 +15,8 @@
  * 
  */
 
-using System;
-using System.Xml;
-using System.Collections;
-using System.Text.RegularExpressions;
-using AODL.Document.Content.Text;
 using AODL.Document.Styles;
-using AODL.Document;
+using System.Xml;
 
 namespace AODL.Document.Content.Text.TextControl {
 
@@ -42,11 +37,11 @@ namespace AODL.Document.Content.Text.TextControl {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="WhiteSpace"/> class.
 		/// </summary>
-		/// <param name="document">The document.</param>
-		/// <param name="node">The node.</param>
-		public WhiteSpace (IDocument document, XmlNode node) {
-			this.Document = document;
-			this.Node = node;
+		/// <param name="Document">The document.</param>
+		/// <param name="Node">The node.</param>
+		public WhiteSpace (IDocument Document, XmlNode Node) {
+			this.Document = Document;
+			this.Node = Node;
 		}
 
 		/// <summary>
@@ -62,15 +57,26 @@ namespace AODL.Document.Content.Text.TextControl {
 			this.Count = whiteSpacesCount;
 			this.StyleName = StyleName;
 
-			XmlAttribute xa;
+			XmlNode node;
+			XmlAttribute xa, xf, xs;
 
-			xa = this.Document.CreateAttribute ("style-name", "text");
-			xa.Value = StyleName;
-			this.Node.Attributes.Append (xa);
+			xf = this.Document.CreateAttribute ("style-name", "text");
+			xf.Value = StyleName;
+			this.Node.Attributes.Append (xf);
+
 			this.Node.AppendChild (this.Document.CreateNode ("s", "text"));
 			xa = this.Document.CreateAttribute ("c", "text");
 			xa.Value = Count.ToString ();
-			this.Node.SelectSingleNode ("text:s", this.Document.NamespaceManager).Attributes.Append (xa);
+
+			xs = this.Document.CreateAttribute ("contextual-spacing", "style");
+			xs.Value = "false";
+
+			//xs = this.Document.CreateAttribute ("text-underline-style ", "style");
+			//xs.Value = "solid";
+			node = this.Node.SelectSingleNode ("text:s", this.Document.NamespaceManager);
+			//node.Attributes.Append (xf);
+			//node.Attributes.Append (xs);
+			node.Attributes.Append (xa);
 		}
 
 		/// <summary>
@@ -123,18 +129,12 @@ namespace AODL.Document.Content.Text.TextControl {
 			}
 		}
 
-		private IDocument _document;
 		/// <summary>
 		/// The document to which this text content belongs to.
 		/// </summary>
 		/// <value></value>
 		public IDocument Document {
-			get {
-				return this._document;
-			}
-			set {
-				this._document = value;
-			}
+			get; set;
 		}
 
 		/// <summary>
@@ -164,7 +164,7 @@ namespace AODL.Document.Content.Text.TextControl {
 
 }
 
-	
+
 /*
  * $Log: WhiteSpace.cs,v $
  * Revision 1.2  2006/02/05 20:02:25  larsbm
